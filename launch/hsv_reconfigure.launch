@@ -1,0 +1,4 @@
+<launch>
+    <node name="flycapture_hsv_reconfugure_right" pkg="ttts" type="flycapture_hsv_reconfugure_right" output="screen"/>
+    <node name="flycapture_hsv_reconfugure_left" pkg="ttts" type="flycapture_hsv_reconfugure_left" output="screen"/>
+</launch>

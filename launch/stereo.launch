@@ -1,0 +1,4 @@
+<launch>
+    <node name="left_image_processing" pkg="ttts" type="left_image_processing" output="screen"/>
+    <node name="right_image_processing" pkg="ttts" type="right_image_processing" output="screen"/>
+</launch>

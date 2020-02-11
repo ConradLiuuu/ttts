@@ -1,0 +1,13 @@
+dynamic_HSV_server/H_min_L: 15
+dynamic_HSV_server/H_max_L: 30
+dynamic_HSV_server/S_min_L: 60
+dynamic_HSV_server/S_max_L: 190
+dynamic_HSV_server/V_min_L: 250
+dynamic_HSV_server/V_max_L: 255
+
+dynamic_HSV_server/H_min_R: 15
+dynamic_HSV_server/H_max_R: 30
+dynamic_HSV_server/S_min_R: 60
+dynamic_HSV_server/S_max_R: 190
+dynamic_HSV_server/V_min_R: 250
+dynamic_HSV_server/V_max_R: 255

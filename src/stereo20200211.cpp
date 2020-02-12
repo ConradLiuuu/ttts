@@ -193,9 +193,9 @@ void tt(){
         hz_W = R_W2L[2][0]*dif_L2W[0] + R_W2L[2][1]*dif_L2W[1] + R_W2L[2][2]*dif_L2W[2];
         //cout << "object position = [" << hx_W / 10 << "," << hy_W / 10 << "," << hz_W / 10 << "]" << endl;
 
-        hx_W = R_W2L[0][0] * dif_L2W[0] + R_W2L[0][1] * dif_L2W[1] + R_W2L[0][2] * dif_L2W[2] - (0.573324);
-        hy_W = R_W2L[1][0] * dif_L2W[0] + R_W2L[1][1] * dif_L2W[1] + R_W2L[1][2] * dif_L2W[2] - (-0.384197);
-        hz_W = R_W2L[2][0] * dif_L2W[0] + R_W2L[2][1] * dif_L2W[1] + R_W2L[2][2] * dif_L2W[2] - (1.507435) + 16;
+        hx_W = R_W2L[0][0] * dif_L2W[0] + R_W2L[0][1] * dif_L2W[1] + R_W2L[0][2] * dif_L2W[2]/* - (7.725139)*/;
+        hy_W = R_W2L[1][0] * dif_L2W[0] + R_W2L[1][1] * dif_L2W[1] + R_W2L[1][2] * dif_L2W[2]/* - (1.153236)*/;
+        hz_W = R_W2L[2][0] * dif_L2W[0] + R_W2L[2][1] * dif_L2W[1] + R_W2L[2][2] * dif_L2W[2] - (11.506209) + 16;
 
         y1 = hy_W;
         //diff = y1-y2;
@@ -203,6 +203,7 @@ void tt(){
           //ROS_INFO("ID_L = %d, ID_R = %d", ID_L, ID_R);
           cout << "ID_L = " << ID_L  << ", ID_R = " << ID_R << endl;;
           ROS_INFO("correction position = [%f, %f, %f]", hx_W / 10, hy_W / 10,hz_W / 10);
+          //ROS_INFO("correction position = [%f, %f, %f]", hx_W, hy_W, hz_W);
           //cout << "correction position = [" << hx_W / 10 << "," << hy_W / 10 << "," << hz_W / 10 << "]" << endl;
           y2 = y1;
         }

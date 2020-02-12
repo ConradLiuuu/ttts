@@ -212,11 +212,14 @@ public:
       }
     }
 */
-    msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_serve).toImageMsg();
-    pub_ROI.publish(msg_ROI);
+    //msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_serve).toImageMsg();
+    //pub_ROI.publish(msg_ROI);
 
     cv::cvtColor(img_serve, img_hsv, CV_BGR2HSV);
     cv::inRange(img_hsv, cv::Scalar(H_min, S_min, V_min), cv::Scalar(H_max, S_max, V_max), img_binary);
+
+    msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_binary).toImageMsg();
+    pub_ROI.publish(msg_ROI);
 
     // Open processing
     element = cv::getStructuringElement(morph_elem, cv::Size(2*morph_size + 1, 2*morph_size+1), cv::Point(morph_size, morph_size));
@@ -230,8 +233,11 @@ public:
     // minEnclosingCircle processing
     for (int i = 0; i < contours.size(); i++){
       double area = cv::contourArea(contours[i]);
-      if ((area > 50)){
+      if ((area > 40)){
         cv::minEnclosingCircle(contours[i], center, radius);
+        //cout << "left area = " << area << endl;
+        cout << "left center = " << center << endl;
+        //cout << "radius = " << radius << endl;
       }
     }
     center_int_type.x = (int)center.x;
@@ -269,7 +275,7 @@ public:
 
     img2 = img.clone();
     cv::Scalar colors = cv::Scalar(0, 0, 255);
-    cv::circle(img2, center, radius, colors, 1, 8, 0);
+    cv::circle(img2, center, radius, colors, 3, 8, 0);
 
     ball_center.data.push_back(cnt_proc);
     ball_center.data.push_back(center_in_world_frame.x);
@@ -279,8 +285,8 @@ public:
 
     contours.clear();
 
-    //msg_binary = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_binary).toImageMsg();
-    //pub_binary.publish(msg_binary);
+    msg_binary = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_binary).toImageMsg();
+    pub_binary.publish(msg_binary);
   
     cnt_proc += 1;
 

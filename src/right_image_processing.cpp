@@ -99,12 +99,12 @@ public:
     center_last = cv::Point2i(200,100);
     T_one2ori = cv::Point2i(960,35);
 
-    nh.getParam("/dynamic_HSV_server/H_min_L", H_min);
-    nh.getParam("/dynamic_HSV_server/H_max_L", H_max);
-    nh.getParam("/dynamic_HSV_server/S_min_L", S_min);
-    nh.getParam("/dynamic_HSV_server/S_max_L", S_max);
-    nh.getParam("/dynamic_HSV_server/V_min_L", V_min);
-    nh.getParam("/dynamic_HSV_server/V_max_L", V_max);
+    nh.getParam("/dynamic_HSV_server/H_min_R", H_min);
+    nh.getParam("/dynamic_HSV_server/H_max_R", H_max);
+    nh.getParam("/dynamic_HSV_server/S_min_R", S_min);
+    nh.getParam("/dynamic_HSV_server/S_max_R", S_max);
+    nh.getParam("/dynamic_HSV_server/V_min_R", V_min);
+    nh.getParam("/dynamic_HSV_server/V_max_R", V_max);
 
     // connect camera
     busMgr.GetCameraFromSerialNumber(SerialNumber, &guid);
@@ -213,11 +213,14 @@ public:
       }
     }
 */
-    msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_serve).toImageMsg();
-    pub_ROI.publish(msg_ROI);
+    //msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_serve).toImageMsg();
+    //pub_ROI.publish(msg_ROI);
 
     cv::cvtColor(img_serve, img_hsv, CV_BGR2HSV);
     cv::inRange(img_hsv, cv::Scalar(H_min, S_min, V_min), cv::Scalar(H_max, S_max, V_max), img_binary);
+
+    msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_binary).toImageMsg();
+    pub_ROI.publish(msg_ROI);
 
     // Open processing
     element = cv::getStructuringElement(morph_elem, cv::Size(2*morph_size + 1, 2*morph_size+1), cv::Point(morph_size, morph_size));
@@ -231,8 +234,11 @@ public:
     // minEnclosingCircle processing
     for (int i = 0; i < contours.size(); i++){
       double area = cv::contourArea(contours[i]);
-      if ((area > 100)){
+      if ((area > 40)){
         cv::minEnclosingCircle(contours[i], center, radius);
+        //cout << "right area = " << area << endl;
+        cout << "right center = " << center << endl;
+        //cout << "radius = " << radius << endl;
       }
     }
     center_int_type.x = (int)center.x;
@@ -270,7 +276,7 @@ public:
 
     img2 = img.clone();
     cv::Scalar colors = cv::Scalar(0, 0, 255);
-    cv::circle(img2, center, radius, colors, 1, 8, 0);
+    cv::circle(img2, center, radius, colors, 3, 8, 0);
 
     ball_center.data.push_back(cnt_proc);
     ball_center.data.push_back(center_in_world_frame.x);
@@ -279,8 +285,8 @@ public:
     ball_center.data.clear();
     contours.clear();
 
-    //msg_binary = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_binary).toImageMsg();
-    //pub_binary.publish(msg_binary);
+    msg_binary = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_binary).toImageMsg();
+    pub_binary.publish(msg_binary);
 
     cnt_proc += 1;
 

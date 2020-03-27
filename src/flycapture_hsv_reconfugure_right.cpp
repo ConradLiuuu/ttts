@@ -66,6 +66,7 @@ int main(int argc, char **argv)
 
   unsigned int rowBytes;
   cv::Mat img, img_hsv, img_canny;
+  cv::cuda::GpuMat uimg_src, uimg_dst;
 
   cv::Mat threshold = cv::Mat::zeros(1536, 2048, CV_8UC3);
 
@@ -97,7 +98,11 @@ int main(int argc, char **argv)
     //cv::resize(img, img, cv::Size(), 0.315, 0.315);
 
     img_hsv = img.clone();
-    cv::cvtColor(img_hsv, img_hsv, CV_BGR2HSV);
+    //uimg_src.upload(img);
+    //cv::cuda::cvtColor(uimg_src, uimg_dst, CV_BGR2HSV_FULL);
+    //cv::cuda::cvtColor(uimg_src, uimg_dst, CV_BGR2HSV);
+    //uimg_dst.download(img_hsv);
+    cv::cvtColor(img_hsv, img_hsv, CV_BGR2HSV_FULL);
 
     nh.getParam("/dynamic_HSV_server/H_min_R",H_min);
     nh.getParam("/dynamic_HSV_server/H_max_R",H_max);
@@ -108,7 +113,7 @@ int main(int argc, char **argv)
 
     cv::inRange(img_hsv, cv::Scalar(H_min, S_min, V_min), cv::Scalar(H_max, S_max, V_max), threshold);
 
-    cv::Canny(threshold, img_canny, 50, 240, 3);
+    //cv::Canny(threshold, img_canny, 50, 240, 3);
 
 
     msg_origin = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img).toImageMsg();

@@ -32,6 +32,7 @@ private:
 
   // openCV setting
   cv::Mat img, img_hsv, img_binary, img_ROI, element, img_serve, img2;
+  cv::cuda::GpuMat uimg_src, hsv, shsv[3], thresc[3], temp, thres, gpuRes, fil;
 
   cv::Point2f center;
   cv::Point2i center_int_type;
@@ -144,6 +145,8 @@ public:
     img = cv::Mat(bgrImage.GetRows(), bgrImage.GetCols(), CV_8UC3, bgrImage.GetData(), rowBytes);
 
     img_serve = img.clone();
+
+    //uimg_src.upload(img);
 /*
     if ((center_int_type.x == 0) && (center_int_type.y == 0)){
       img_serve = img(cv::Rect(T_one2ori.x, T_one2ori.y, 640, 240));
@@ -215,29 +218,65 @@ public:
     //msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_serve).toImageMsg();
     //pub_ROI.publish(msg_ROI);
 
-    cv::cvtColor(img_serve, img_hsv, CV_BGR2HSV);
+    cv::cvtColor(img_serve, img_hsv, CV_BGR2HSV_FULL);
     cv::inRange(img_hsv, cv::Scalar(H_min, S_min, V_min), cv::Scalar(H_max, S_max, V_max), img_binary);
+/*
+    cv::cuda::cvtColor(uimg_src, hsv, CV_BGR2HSV_FULL);
+    cv::cuda::split(hsv, shsv);
+    cv::cuda::threshold(shsv[0], thresc[0], H_min, H_max, CV_THRESH_BINARY);
+    cv::cuda::threshold(shsv[1], thresc[1], S_min, S_max, CV_THRESH_BINARY);
+    cv::cuda::threshold(shsv[2], thresc[2], V_min, V_max, CV_THRESH_BINARY);
+    cv::cuda::bitwise_and(thresc[0], thresc[1], temp);
+    cv::cuda::bitwise_and(temp, thresc[2], thres);
+    thres.download(img_binary);
+*/
+/*
+    cv::Ptr<cv::cuda::Filter> medianCUDA = cv::cuda::createMedianFilter(CV_8U, 3);
+    medianCUDA->apply(thres, fil);
+    fil.download(img_binary);
+*/
 
     msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_binary).toImageMsg();
     pub_ROI.publish(msg_ROI);
+/*
+    std::vector<cv::Vec3f> gpuCircles;
+    cv::Ptr<cv::cuda::HoughCirclesDetector> gpuDetector = cv::cuda::createHoughCirclesDetector(1, 10, 10, 10, 3, 10);
+    gpuDetector->detect(thres, gpuRes);
+    gpuCircles.resize(gpuRes.size().width);
+    if (!gpuCircles.empty()){
+      gpuRes.row(0).download(cv::Mat(gpuCircles).reshape(3, 1));
+    }
+    img2 = img.clone();
+    for(std::vector<cv::Vec3f>::const_iterator it = gpuCircles.begin() ; it != gpuCircles.end() ; ++it){
+      cout << it->val[0] << ", " << it->val[1] << ", " << it->val[2] << endl;
+      center.x = it->val[0];
+      center.y = it->val[1];
+      radius = it->val[2];
+      cv::Scalar colors = cv::Scalar(0, 0, 255);
+      cv::circle(img2, center, radius, colors, 3, 8, 0);
+    }
+    */
 
     // Open processing
     element = cv::getStructuringElement(morph_elem, cv::Size(2*morph_size + 1, 2*morph_size+1), cv::Point(morph_size, morph_size));
     cv::morphologyEx(img_binary, img_binary, 2, element);
 
+    //cv::medianBlur(img_binary, img_binary, 5);
+
     // dilate processing
-    dilate(img_binary, img_binary, element);
+    //dilate(img_binary, img_binary, element);
 
     cv::findContours(img_binary, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
     // minEnclosingCircle processing
     for (int i = 0; i < contours.size(); i++){
       double area = cv::contourArea(contours[i]);
-      if ((area > 40)){
+      cout << "left area = " << area << endl;
+      if ((area > 5)){
         cv::minEnclosingCircle(contours[i], center, radius);
         //cout << "left area = " << area << endl;
         cout << "left center = " << center << endl;
-        //cout << "radius = " << radius << endl;
+        cout << "left radius = " << radius << endl;
       }
     }
     center_int_type.x = (int)center.x;

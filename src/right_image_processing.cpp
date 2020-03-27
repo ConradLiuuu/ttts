@@ -216,7 +216,7 @@ public:
     //msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_serve).toImageMsg();
     //pub_ROI.publish(msg_ROI);
 
-    cv::cvtColor(img_serve, img_hsv, CV_BGR2HSV);
+    cv::cvtColor(img_serve, img_hsv, CV_BGR2HSV_FULL);
     cv::inRange(img_hsv, cv::Scalar(H_min, S_min, V_min), cv::Scalar(H_max, S_max, V_max), img_binary);
 
     msg_ROI = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_binary).toImageMsg();
@@ -227,18 +227,20 @@ public:
     cv::morphologyEx(img_binary, img_binary, 2, element);
 
     // dilate processing
-    dilate(img_binary, img_binary, element);
+    //dilate(img_binary, img_binary, element);
+    //cv::medianBlur(img_binary, img_binary, 5);
 
     cv::findContours(img_binary, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
     // minEnclosingCircle processing
     for (int i = 0; i < contours.size(); i++){
       double area = cv::contourArea(contours[i]);
-      if ((area > 40)){
+      cout << "right area = " << area << endl;
+      if ((area > 50)){
         cv::minEnclosingCircle(contours[i], center, radius);
         //cout << "right area = " << area << endl;
         cout << "right center = " << center << endl;
-        //cout << "radius = " << radius << endl;
+        cout << "right radius = " << radius << endl;
       }
     }
     center_int_type.x = (int)center.x;

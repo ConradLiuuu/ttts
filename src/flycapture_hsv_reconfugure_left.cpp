@@ -66,6 +66,9 @@ int main(int argc, char **argv)
 
   unsigned int rowBytes;
   cv::Mat img, img_hsv, img_canny;
+  cv::cuda::GpuMat uimg_src, uimg_dst;
+
+  cv::cuda::GpuMat hsv, shsv[3], thresc[3], temp, thres;
 
   cv::Mat threshold = cv::Mat::zeros(1536, 2048, CV_8UC3);
 
@@ -97,8 +100,15 @@ int main(int argc, char **argv)
     //cv::resize(img, img, cv::Size(), 0.315, 0.315);
 
     img_hsv = img.clone();
-    cv::cvtColor(img_hsv, img_hsv, CV_BGR2HSV);
-
+    //uimg_src.upload(img);
+    //cv::cuda::cvtColor(uimg_src, uimg_dst, CV_BGR2HSV_FULL);
+    //cv::cuda::cvtColor(uimg_src, uimg_dst, CV_BGR2HSV);
+    //uimg_dst.download(img_hsv);
+    cv::cvtColor(img_hsv, img_hsv, CV_BGR2HSV_FULL);
+/*
+    cv::cuda::cvtColor(uimg_src, hsv, CV_BGR2HSV_FULL);
+    cv::cuda::split(hsv, shsv);
+*/
     nh.getParam("/dynamic_HSV_server/H_min_L",H_min);
     nh.getParam("/dynamic_HSV_server/H_max_L",H_max);
     nh.getParam("/dynamic_HSV_server/S_min_L",S_min);
@@ -107,8 +117,17 @@ int main(int argc, char **argv)
     nh.getParam("/dynamic_HSV_server/V_max_L",V_max);
 
     cv::inRange(img_hsv, cv::Scalar(H_min, S_min, V_min), cv::Scalar(H_max, S_max, V_max), threshold);
+    /*
+    cv::cuda::threshold(shsv[0], thresc[0], H_min, H_max, CV_THRESH_BINARY);
+    cv::cuda::threshold(shsv[1], thresc[1], S_min, S_max, CV_THRESH_BINARY);
+    cv::cuda::threshold(shsv[2], thresc[2], V_min, V_max, CV_THRESH_BINARY);
 
-    cv::Canny(threshold, img_canny, 50, 240, 3);
+    cv::cuda::bitwise_and(thresc[0], thresc[1], temp);
+    cv::cuda::bitwise_and(temp, thresc[2], thres);
+    thres.download(threshold);
+*/
+
+    //cv::Canny(threshold, img_canny, 50, 240, 3);
 
 
     msg_origin = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img).toImageMsg();

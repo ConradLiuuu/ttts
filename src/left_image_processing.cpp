@@ -28,7 +28,7 @@ private:
   PGRGuid guid;
   Image rawImage;
   Image bgrImage;
-  Property frmRate;
+  Property frmRate, prop;
 
   // openCV setting
   cv::Mat img, img_hsv, img_binary, img_ROI, element, img_serve, img2;
@@ -114,6 +114,14 @@ public:
     frmRate.type = FRAME_RATE;
     error = camera.GetProperty(&frmRate);
     cout << "Left camera setting frameRate = " << frmRate.absValue << endl;
+
+    // set camera white balance
+    prop.type = WHITE_BALANCE;
+    prop.onOff = true;
+    prop.autoManualMode = false;
+    prop.valueA = 644;
+    prop.valueB = 955;
+    error = camera.SetProperty(&prop); 
 
     // start capture image
     error = camera.StartCapture();
@@ -258,13 +266,13 @@ public:
     */
 
     // Open processing
-    element = cv::getStructuringElement(morph_elem, cv::Size(2*morph_size + 1, 2*morph_size+1), cv::Point(morph_size, morph_size));
-    cv::morphologyEx(img_binary, img_binary, 2, element);
+    //element = cv::getStructuringElement(morph_elem, cv::Size(2*morph_size + 1, 2*morph_size+1), cv::Point(morph_size, morph_size));
+    //cv::morphologyEx(img_binary, img_binary, 2, element);
 
-    //cv::medianBlur(img_binary, img_binary, 5);
+    cv::medianBlur(img_binary, img_binary, 5);
 
     // dilate processing
-    //dilate(img_binary, img_binary, element);
+    //cv::dilate(img_binary, img_binary, element);
 
     cv::findContours(img_binary, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
 
@@ -272,7 +280,7 @@ public:
     for (int i = 0; i < contours.size(); i++){
       double area = cv::contourArea(contours[i]);
       cout << "left area = " << area << endl;
-      if ((area > 5)){
+      if ((area > 100)){
         cv::minEnclosingCircle(contours[i], center, radius);
         //cout << "left area = " << area << endl;
         cout << "left center = " << center << endl;

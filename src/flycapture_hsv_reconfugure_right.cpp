@@ -26,6 +26,7 @@ int main(int argc, char **argv)
   CameraInfo camInfo;
   BusManager busMgr;
   PGRGuid guid_L;
+  Property prop;
 
   unsigned int SerialNumber = 17491067; // right
   //unsigned int SerialNumber = 17491073; // left
@@ -47,6 +48,14 @@ int main(int argc, char **argv)
   cout << "Vendor name :" << camInfo.vendorName << endl;
   cout << "Model name :" << camInfo.modelName << endl;
   cout << "Serial number :" << camInfo.serialNumber << endl;
+
+  // set camera white balance
+  prop.type = WHITE_BALANCE;
+  prop.onOff = true;
+  prop.autoManualMode = false;
+  prop.valueA = 644;
+  prop.valueB = 955;
+  error = camera.SetProperty(&prop); 
 
   // Start capture image
   error = camera.StartCapture();

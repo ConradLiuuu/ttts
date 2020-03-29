@@ -27,7 +27,7 @@ int main(int argc, char **argv)
   Point2f mc;
 
   // Read image
-  std::string path = "/home/lab606a/findcontour/left_sample7.jpg";
+  std::string path = "/home/lab606a/findcontour/left_sample8.jpg";
   img = imread(path);
 
   draw = img.clone();
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 
   // Convert color space and find contour
   cvtColor(img, img_binary, CV_BGR2HSV);
-  inRange(img_binary, Scalar(15, 60, 250), Scalar(30, 190, 255), img_binary);
+  inRange(img_binary, Scalar(10, 135, 250), Scalar(30, 255, 255), img_binary);
   findContours(img_binary, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
   // Draw contour
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     //Scalar color = Scalar( 255, 255, 0 );
     double area = contourArea(contours[i]);
     cout << "area = " << area << endl;
-    if (area > 50) {
+    if (area > 30) {
       contourrrr.push_back(contours[i]);
     }
   }

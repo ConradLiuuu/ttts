@@ -322,7 +322,7 @@ public:
 
     img2 = img.clone();
     cv::Scalar colors = cv::Scalar(0, 0, 255);
-    cv::circle(img2, center, radius, colors, 3, 8, 0);
+    cv::circle(img2, center, radius, colors, 1, 8, 0);
 
     ball_center.data.push_back(cnt_proc);
     ball_center.data.push_back(center_in_world_frame.x);

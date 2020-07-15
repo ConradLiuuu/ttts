@@ -1,0 +1,4 @@
+<launch>
+    <node name="thread_left_gpu" pkg="videostream" type="thread_left_gpu" output="screen"/>
+    <node name="thread_right_gpu" pkg="videostream" type="thread_right_gpu" output="screen"/>
+</launch>

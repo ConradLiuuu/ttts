@@ -7,20 +7,27 @@ add_compile_options(-std=c++11)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+
+set(cv_bridge_DIR /usr/local/share/cv_bridge/cmake)
+find_package(PCL REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
+  pcl_ros
   image_transport
   roscpp
   rospy
   sensor_msgs
   std_msgs
-  OpenCV
   dynamic_reconfigure
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+find_package(OpenCV REQUIRED
+NO_MODULE # should be optional, tells CMake to use config mode
+PATHS /usr/local # look here
+NO_DEFAULT_PATH) # and don't look anywhere else
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -122,7 +129,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
-  ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} /usr/include/flycapture 
+  ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} /usr/include/flycapture include${PCL_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -139,13 +146,10 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/ttts_node.cpp)
-add_executable(comparision src/comparision.cpp)
-add_executable(stereo20200211 src/stereo20200211.cpp)
-add_executable(dynamic_HSV_server src/dynamic_HSV_server.cpp)
-add_executable(flycapture_hsv_reconfugure_right src/flycapture_hsv_reconfugure_right.cpp)
-add_executable(flycapture_hsv_reconfugure_left src/flycapture_hsv_reconfugure_left.cpp)
-add_executable(left_image_processing src/left_image_processing.cpp)
-add_executable(right_image_processing src/right_image_processing.cpp)
+
+add_executable(stereoooo src/stereoooo.cpp)
+add_executable(thread_right_gpu src/thread_right_gpu.cpp)
+add_executable(thread_left_gpu src/thread_left_gpu.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -161,19 +165,23 @@ add_executable(right_image_processing src/right_image_processing.cpp)
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-target_link_libraries(comparision ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
-target_link_libraries(dynamic_HSV_server ${catkin_LIBRARIES})
+target_link_libraries(stereoooo
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
 
-target_link_libraries(stereo20200211 ${catkin_LIBRARIES})
+target_link_libraries(thread_right_gpu 
+  ${OpenCV_LIBS} 
+  ${catkin_LIBRARIES} 
+  -lflycapture${D}
+) 
 
-target_link_libraries(flycapture_hsv_reconfugure_right ${OpenCV_LIBS} ${catkin_LIBRARIES} -L../../lib -lflycapture${D} ${FC2_DEPS})
-
-target_link_libraries(flycapture_hsv_reconfugure_left ${OpenCV_LIBS} ${catkin_LIBRARIES} -L../../lib -lflycapture${D} ${FC2_DEPS})
-
-target_link_libraries(left_image_processing ${OpenCV_LIBS} ${catkin_LIBRARIES} -L../../lib -lflycapture${D} ${FC2_DEPS})
-
-target_link_libraries(right_image_processing ${OpenCV_LIBS} ${catkin_LIBRARIES} -L../../lib -lflycapture${D} ${FC2_DEPS})
+target_link_libraries(thread_left_gpu 
+  ${OpenCV_LIBS} 
+  ${catkin_LIBRARIES} 
+  -lflycapture${D}
+) 
 
 #############
 ## Install ##

@@ -1,6 +1,0 @@
-<launch>
-    <node name="flycapture_hsv_reconfugure_right" pkg="ttts" type="flycapture_hsv_reconfugure_right" output="screen"/>
-    <node name="flycapture_hsv_reconfugure_left" pkg="ttts" type="flycapture_hsv_reconfugure_left" output="screen"/>
-    <node name="dynamic_HSV_server" pkg="ttts" type="dynamic_HSV_server" output="screen"/>
-    <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui" output="screen"/>
-</launch>

@@ -1,5 +1,0 @@
-<launch>
-    <node name="left_image_processing" pkg="ttts" type="left_image_processing" output="screen"/>
-    <node name="right_image_processing" pkg="ttts" type="right_image_processing" output="screen"/>
-    <node name="rqt_gui" pkg="rqt_gui" type="rqt_gui" output="screen"/>
-</launch>

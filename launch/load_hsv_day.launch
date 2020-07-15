@@ -1,3 +1,0 @@
-<launch>
-  <rosparam command="load" file="/home/lab606a/TableTennis_ws/src/ttts/config/hsv_config_day.yaml" />
-</launch>
